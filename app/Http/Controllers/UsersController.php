@@ -28,8 +28,8 @@ class UsersController extends Controller {
 	}
 
 	public function show(User $user) {
-        $statuses = $user->statuses()->orderBy('created_at', 'desc')->paginate(10);
-        return view('users.show', compact('user', 'statuses'));
+		$statuses = $user->statuses()->orderBy('created_at', 'desc')->paginate(10);
+		return view('users.show', compact('user', 'statuses'));
 	}
 
 	public function store(Request $request) {
@@ -82,14 +82,14 @@ class UsersController extends Controller {
 	}
 
 	protected function sendEmailConfirmationTo($user) {
-        $view = 'emails.confirm';
-        $data = compact('user');
-        $to = $user->email;
-        $subject = "感谢注册 Weibo 应用！请确认你的邮箱。";
+		$view = 'emails.confirm';
+		$data = compact('user');
+		$to = $user->email;
+		$subject = "感谢注册 Weibo 应用！请确认你的邮箱。";
 
-        Mail::send($view, $data, function ($message) use ($to, $subject) {
-            $message->to($to)->subject($subject);
-        });
+		Mail::send($view, $data, function ($message) use ($to, $subject) {
+			$message->to($to)->subject($subject);
+		});
 	}
 
 	public function confirmEmail($token) {
@@ -102,5 +102,17 @@ class UsersController extends Controller {
 		Auth::login($user);
 		session()->flash('success', '恭喜你，激活成功！');
 		return redirect()->route('users.show', [$user]);
+	}
+
+	public function followings(User $user) {
+		$users = $user->followings()->paginate(30);
+		$title = $user->name . '关注的人';
+		return view('users.show_follow', compact('users', 'title'));
+	}
+
+	public function followers(User $user) {
+		$users = $user->followers()->paginate(30);
+		$title = $user->name . '的粉丝';
+		return view('users.show_follow', compact('users', 'title'));
 	}
 }
